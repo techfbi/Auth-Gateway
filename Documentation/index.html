@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auth Gateway, Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens ─────────────────────────────────────────────── */
+    :root {
+      --bg:          #F8F8F6;
+      --surface:     #FFFFFF;
+      --surface-2:   #F2F2EF;
+      --border:      #E4E4DF;
+      --text:        #18181A;
+      --text-2:      #5C5C62;
+      --text-3:      #9898A4;
+      --accent:      #7C3AED;
+      --accent-dim:  rgba(124,58,237,0.08);
+      --accent-line: rgba(124,58,237,0.25);
+      --get:         #059669;
+      --get-bg:      rgba(5,150,105,0.08);
+      --post:        #2563EB;
+      --post-bg:     rgba(37,99,235,0.08);
+      --delete:      #DC2626;
+      --delete-bg:   rgba(220,38,38,0.08);
+      --warn:        #D97706;
+      --warn-bg:     rgba(217,119,6,0.08);
+      --code-bg:     #1E1E2E;
+      --code-text:   #CDD6F4;
+      --code-string: #A6E3A1;
+      --code-key:    #89B4FA;
+      --code-num:    #FAB387;
+      --code-kw:     #CBA6F7;
+      --code-faded:  #585B70;
+      --shadow:      0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:   0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    [data-theme="dark"] {
+      --bg:         #0C0C12;
+      --surface:    #13131C;
+      --surface-2:  #1A1A26;
+      --border:     #28283A;
+      --text:       #EEEEF4;
+      --text-2:     #9090A8;
+      --text-3:     #58586C;
+      --accent:     #9D71FF;
+      --accent-dim: rgba(157,113,255,0.10);
+      --accent-line:rgba(157,113,255,0.28);
+      --get:        #34D399;
+      --get-bg:     rgba(52,211,153,0.08);
+      --post:       #60A5FA;
+      --post-bg:    rgba(96,165,250,0.08);
+      --delete:     #F87171;
+      --delete-bg:  rgba(248,113,113,0.08);
+      --warn:       #FCD34D;
+      --warn-bg:    rgba(252,211,77,0.08);
+      --shadow:     0 1px 3px rgba(0,0,0,0.2);
+      --shadow-md:  0 4px 16px rgba(0,0,0,0.28);
+    }
+
+    /* ── Reset ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      transition: background 0.2s, color 0.2s;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    img { max-width: 100%; }
+
+    /* ── Typography ────────────────────────────────────────────────── */
+    h1, h2, h3, h4 { font-family: 'Sora', sans-serif; line-height: 1.25; }
+    h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; letter-spacing: -0.03em; }
+    h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 700; letter-spacing: -0.02em; }
+    h3 { font-size: 1.15rem; font-weight: 600; }
+    h4 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-3); }
+    p { color: var(--text-2); font-size: 0.9375rem; }
+    strong { color: var(--text); font-weight: 600; }
+
+    /* ── Code ──────────────────────────────────────────────────────── */
+    code {
+      font-family: 'Consolas', 'Droid Sans Mono', 'Courier New', monospace;
+      font-size: 0.82em;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+    pre {
+      background: var(--code-bg);
+      border-radius: 10px;
+      padding: 20px 22px;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Droid Sans Mono', 'Courier New', monospace;
+      font-size: 0.835rem;
+      line-height: 1.65;
+      color: var(--code-text);
+      position: relative;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+    .c-s { color: var(--code-string); }
+    .c-k { color: var(--code-key); }
+    .c-n { color: var(--code-num); }
+    .c-w { color: var(--code-kw); }
+    .c-f { color: var(--code-faded); font-style: italic; }
+    .c-p { color: #F38BA8; }
+
+    /* ── Layout ────────────────────────────────────────────────────── */
+    .wrap { max-width: 820px; margin: 0 auto; padding: 0 24px; }
+    .wrap-wide { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Sticky header ─────────────────────────────────────────────── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      gap: 16px;
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; min-width: 0; }
+    .header-title {
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+    .header-byline {
+      font-size: 0.75rem;
+      color: var(--text-3);
+      font-weight: 500;
+      white-space: nowrap;
+      padding-left: 16px;
+      border-left: 1px solid var(--border);
+    }
+    .header-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .gh-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-2);
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .gh-link:hover { color: var(--accent); border-color: var(--accent-line); text-decoration: none; }
+    .theme-btn {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface-2);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-2);
+      font-size: 14px;
+      transition: border-color 0.15s;
+    }
+    .theme-btn:hover { border-color: var(--accent-line); }
+
+    /* ── Top anchor nav ────────────────────────────────────────────── */
+    .top-nav {
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .top-nav::-webkit-scrollbar { display: none; }
+    .top-nav-inner {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      height: 40px;
+      width: max-content;
+      padding: 0 24px;
+    }
+    .top-nav a {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-3);
+      padding: 0 14px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .top-nav a:hover { color: var(--text); border-bottom-color: var(--accent-line); }
+
+    /* ── Sections ──────────────────────────────────────────────────── */
+    .section { padding: 72px 0; }
+    .section + .section { border-top: 1px solid var(--border); }
+    .section-label {
+      display: inline-block;
+      font-family: 'Sora', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .section-intro { max-width: 580px; margin-top: 16px; font-size: 1rem; }
+
+    /* ── Hero ──────────────────────────────────────────────────────── */
+    .hero { padding: 80px 0 64px; }
+    .hero-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 28px;
+    }
+    .stack-badge {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      background: var(--surface);
+    }
+    .hero-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 40px;
+    }
+    .summary-item {
+      background: var(--surface);
+      padding: 20px 22px;
+    }
+    .summary-num {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .summary-label { font-size: 0.8rem; color: var(--text-2); margin-top: 4px; }
+
+    /* ── Cards ─────────────────────────────────────────────────────── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px 22px 20px;
+    }
+    .card-icon {
+      width: 36px; height: 36px;
+      background: var(--accent-dim);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      margin-bottom: 14px;
+    }
+    .card h3 { font-size: 0.92rem; margin-bottom: 6px; }
+    .card p { font-size: 0.84rem; }
+
+    /* ── Architecture diagram ──────────────────────────────────────── */
+    .arch-box {
+      background: var(--code-bg);
+      border-radius: 10px;
+      padding: 28px;
+      margin-top: 28px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.82rem;
+      color: var(--code-text);
+      line-height: 1.9;
+      overflow-x: auto;
+    }
+    .arch-box .dim { color: var(--code-faded); }
+    .arch-box .hi  { color: var(--code-string); }
+    .arch-box .ac  { color: var(--code-kw); }
+    .arch-box .bl  { color: var(--code-key); }
+
+    /* ── Token family flow ─────────────────────────────────────────── */
+    .flow-steps {
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 28px;
+      position: relative;
+    }
+    .flow-steps::before {
+      content: '';
+      position: absolute;
+      left: 17px;
+      top: 18px;
+      bottom: 18px;
+      width: 1px;
+      background: var(--border);
+    }
+    .flow-step {
+      display: flex;
+      gap: 18px;
+      padding: 16px 0;
+      position: relative;
+    }
+    .step-num {
+      counter-increment: step;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Sora', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-3);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .flow-step.active .step-num {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+    .flow-step.danger .step-num {
+      border-color: var(--delete);
+      color: var(--delete);
+      background: rgba(220,38,38,0.08);
+    }
+    .step-body { padding-top: 6px; }
+    .step-body h3 { font-size: 0.92rem; margin-bottom: 4px; }
+    .step-body p { font-size: 0.84rem; }
+
+    /* ── API reference ─────────────────────────────────────────────── */
+    .endpoint-block {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 24px;
+    }
+    .endpoint-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .method-badge {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+    .method-get    { background: var(--get-bg);    color: var(--get); }
+    .method-post   { background: var(--post-bg);   color: var(--post); }
+    .method-delete { background: var(--delete-bg); color: var(--delete); }
+    .endpoint-path {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .endpoint-body { padding: 18px 18px 20px; background: var(--surface-2); }
+    .endpoint-body p { font-size: 0.875rem; margin-bottom: 14px; }
+    .endpoint-body h4 { margin: 18px 0 8px; }
+
+    .err-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .err-pill {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.72rem;
+      padding: 3px 9px;
+      border-radius: 100px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+    }
+    .err-pill .ep-status {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--delete);
+      margin-right: 4px;
+    }
+
+    /* ── Callouts ───────────────────────────────────────────────────── */
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: var(--accent-dim);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 0.875rem;
+    }
+    .callout.warn { border-left-color: var(--warn); background: var(--warn-bg); }
+    .callout.danger { border-left-color: var(--delete); background: var(--delete-bg); }
+    .callout p { font-size: 0.875rem; color: var(--text); }
+
+    /* ── Live demo ─────────────────────────────────────────────────── */
+    .demo-wrapper {
+      background: var(--code-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 28px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .demo-tab-bar {
+      display: flex;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 18px;
+    }
+    .demo-tab {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--code-faded);
+      padding: 0 14px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      user-select: none;
+    }
+    .demo-tab.active { color: var(--code-kw); border-bottom-color: var(--code-kw); }
+    .demo-panel { display: none; padding: 20px 22px; }
+    .demo-panel.active { display: block; }
+
+    .demo-input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .demo-label {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.72rem;
+      color: var(--code-faded);
+      font-weight: 600;
+      min-width: 80px;
+    }
+    .demo-input {
+      flex: 1;
+      min-width: 180px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: var(--code-text);
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.82rem;
+      outline: none;
+    }
+    .demo-input:focus { border-color: rgba(157,113,255,0.5); }
+    .demo-btn {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 7px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: var(--code-kw);
+      color: var(--code-bg);
+      transition: opacity 0.15s;
+    }
+    .demo-btn:hover { opacity: 0.85; }
+    .demo-btn:disabled { opacity: 0.4; cursor: default; }
+    .demo-btn.danger { background: #F38BA8; }
+
+    .demo-response {
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: var(--code-faded);
+      min-height: 60px;
+      margin-top: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .demo-response.success { color: var(--code-string); }
+    .demo-response.error { color: #F38BA8; }
+    .demo-step-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--code-key);
+      margin-bottom: 14px;
+      letter-spacing: 0.04em;
+    }
+    .demo-note { font-family: 'Manrope', sans-serif; font-size: 0.78rem; color: var(--code-faded); margin-top: 10px; }
+
+    /* ── Error table ────────────────────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 20px; }
+    thead th {
+      background: var(--surface-2);
+      font-family: 'Sora', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: 9px 14px;
+      text-align: left;
+      border-bottom: 2px solid var(--border);
+    }
+    tbody td { padding: 9px 14px; border-bottom: 1px solid var(--border); color: var(--text-2); vertical-align: top; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--surface-2); }
+    td code { font-size: 0.8rem; }
+
+    /* ── Footer ─────────────────────────────────────────────────────── */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+    }
+    .site-footer p { font-size: 0.8rem; }
+
+    /* ── Flaw callout ────────────────────────────────────────────────── */
+    .flaw-note {
+      background: rgba(249,115,22,0.07);
+      border: 1px solid rgba(249,115,22,0.2);
+      border-radius: 10px;
+      padding: 20px 22px;
+      margin-top: 28px;
+    }
+    .flaw-note h3 { font-size: 0.88rem; color: #F97316; margin-bottom: 8px; }
+    .flaw-note p { font-size: 0.84rem; }
+
+    /* ── Token flow diagram ─────────────────────────────────────────── */
+    .token-flow { margin-top: 32px; }
+
+    .tf-group {
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .tf-group-danger { border-color: rgba(220,38,38,0.25); }
+
+    .tf-group-label {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--surface-2);
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tf-group-label.danger {
+      color: var(--delete);
+      background: var(--delete-bg);
+      border-bottom-color: rgba(220,38,38,0.15);
+    }
+
+    .tf-step {
+      display: flex;
+      gap: 16px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      align-items: flex-start;
+    }
+
+    .tf-step:last-child { border-bottom: none; }
+    .tf-step.danger { background: rgba(220,38,38,0.02); }
+
+    .tf-num {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Sora', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-3);
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .tf-num.danger {
+      background: var(--delete-bg);
+      border-color: rgba(220,38,38,0.3);
+      color: var(--delete);
+    }
+
+    .tf-content { flex: 1; min-width: 0; }
+
+    .tf-actor {
+      display: inline-block;
+      font-family: 'Sora', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-bottom: 6px;
+    }
+
+    .tf-actor.client  { background: var(--post-bg);    color: var(--post); }
+    .tf-actor.server  { background: var(--get-bg);     color: var(--get); }
+    .tf-actor.attacker { background: var(--delete-bg); color: var(--delete); }
+
+    .tf-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .tf-body { font-size: 0.82rem; color: var(--text-2); line-height: 1.6; }
+
+    .tf-tokens { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+
+    .tf-token {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .tf-token.access  { background: var(--post-bg); border-color: rgba(37,99,235,0.15); }
+    .tf-token.refresh { background: var(--get-bg);  border-color: rgba(5,150,105,0.15); }
+
+    .tf-token-name {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      min-width: 110px;
+    }
+
+    .tf-token.access  .tf-token-name { color: var(--post); }
+    .tf-token.refresh .tf-token-name { color: var(--get); }
+    .tf-token-meta { font-size: 0.76rem; color: var(--text-2); line-height: 1.4; }
+
+    /* ── Responsive ─────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .header-byline { display: none; }
+      .section { padding: 48px 0; }
+      .hero { padding: 52px 0 40px; }
+      .hero-summary { grid-template-columns: 1fr 1fr; }
+      pre { font-size: 0.78rem; }
+      .demo-tab { padding: 0 10px; font-size: 0.7rem; }
+      .demo-tab-bar { padding: 0 10px; }
+      .demo-panel { padding: 14px 12px; }
+      .demo-input-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .demo-input { min-width: 100%; width: 100%; }
+      .demo-label { min-width: unset; }
+      .demo-btn { width: 100%; text-align: center; }
+      .demo-response { font-size: 0.72rem; }
+      .demo-wrapper { border-radius: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Sticky header ──────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="header-inner wrap-wide">
+    <div class="header-left">
+      <span class="header-title">Auth Gateway</span>
+      <span class="header-byline">Backend Engineer: Oluwafemi Johnson</span>
+    </div>
+    <div class="header-right">
+      <a href="https://github.com/ojoluwafemi/auth-gateway" class="gh-link" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.268 2.75 1.026A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.026 2.747-1.026.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+        </svg>
+        GitHub
+      </a>
+      <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">☀</button>
+    </div>
+  </div>
+</header>
+
+<!-- ── Top anchor nav ─────────────────────────────────────────── -->
+<nav class="top-nav" aria-label="Page sections">
+  <div class="top-nav-inner wrap-wide">
+    <a href="#overview">Overview</a>
+    <a href="#flow">Token Flow</a>
+    <a href="#philosophy">Philosophy</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#token-family">Token Family</a>
+    <a href="#api">API Reference</a>
+    <a href="#demo">Live Demo</a>
+    <a href="#errors">Error Codes</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ── Hero ──────────────────────────────────────────────────── -->
+<div class="hero" id="overview">
+  <div class="wrap">
+    <span class="section-label">Auth Gateway</span>
+    <h1>Production-grade<br>authentication.</h1>
+    <p class="section-intro">
+      A complete, self-contained authentication system built on Node.js and PostgreSQL. Dual-token architecture, rotating refresh tokens with theft detection, OTP-verified registration, and Google OAuth, all with no third-party auth service in the middle. Click the github button for full code.
+    </p>
+
+    <div class="hero-stack">
+      <span class="stack-badge">Node.js</span>
+      <span class="stack-badge">TypeScript</span>
+      <span class="stack-badge">Express</span>
+      <span class="stack-badge">PostgreSQL</span>
+      <span class="stack-badge">JWT</span>
+      <span class="stack-badge">Argon2id</span>
+      <span class="stack-badge">Google OAuth 2.0</span>
+      <span class="stack-badge">Resend</span>
+      <span class="stack-badge">Redis</span>
+    </div>
+
+    <div class="hero-summary">
+      <div class="summary-item">
+        <div class="summary-num">15m</div>
+        <div class="summary-label">Access token lifetime</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-num">7d</div>
+        <div class="summary-label">Refresh token lifetime</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-num">10</div>
+        <div class="summary-label">Auth endpoints</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-num">0</div>
+        <div class="summary-label">Tokens in localStorage</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Token Flow Diagram ──────────────────────────────────────── -->
+<section class="section" id="flow">
+  <div class="wrap">
+    <span class="section-label">Token Lifecycle</span>
+    <h2>From login to revocation</h2>
+    <p class="section-intro">Every step the system takes, from the moment a user signs in, through token rotation, to what happens the instant a stolen token is detected.</p>
+
+    <div class="token-flow">
+
+      <div class="tf-group">
+        <div class="tf-group-label">01 &mdash; Authentication</div>
+        <div class="tf-step">
+          <div class="tf-num">1</div>
+          <div class="tf-content">
+            <span class="tf-actor client">Client</span>
+            <div class="tf-title">POST /api/auth/login</div>
+            <div class="tf-body">Sends <code>email</code> and <code>password</code> in the request body.</div>
+          </div>
+        </div>
+        <div class="tf-step">
+          <div class="tf-num">2</div>
+          <div class="tf-content">
+            <span class="tf-actor server">Server</span>
+            <div class="tf-title">Validates credentials and issues both tokens</div>
+            <div class="tf-body">Verifies the password against the Argon2id hash. Generates a <code>family_id</code> &mdash; a UUID that links every token rotation in this session to a single revocable chain.</div>
+            <div class="tf-tokens">
+              <div class="tf-token access">
+                <span class="tf-token-name">Access Token</span>
+                <span class="tf-token-meta">JWT &middot; signed with ACCESS_TOKEN_SECRET &middot; 15 min lifetime &middot; returned in response body</span>
+              </div>
+              <div class="tf-token refresh">
+                <span class="tf-token-name">Refresh Token</span>
+                <span class="tf-token-meta">96-byte random value &middot; SHA-256 hash stored in DB &middot; 7 day lifetime &middot; set as httpOnly cookie</span>
+              </div>
+            </div>
+            <div class="callout" style="margin-top: 12px;">
+              <p><strong>What is a family_id?</strong> Every login session gets a UUID called a <code>family_id</code>, stored alongside the refresh token in the database. As the token rotates over time, each new token inherits the same <code>family_id</code>. This links the entire chain of rotations. Token A → Token B → Token C — back to the original login event. Its only purpose is revocation: if any token in the chain is misused, the server can find and revoke every other token in that session by querying a single <code>family_id</code>, without touching tokens from other sessions or other devices.</p>
+            </div>
+          </div>
+        </div>
+        <div class="tf-step">
+          <div class="tf-num">3</div>
+          <div class="tf-content">
+            <span class="tf-actor client">Client</span>
+            <div class="tf-title">Stores each token where it belongs</div>
+            <div class="tf-body">Access token is held in JavaScript memory only, never written to <code>localStorage</code> or a cookie. It disappears on tab close. Refresh token is an <code>httpOnly</code> cookie set by the server, JavaScript cannot read or access it at all. The browser holds it and sends it automatically on refresh requests.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tf-group">
+        <div class="tf-group-label">02 &mdash; Making Authenticated Requests</div>
+        <div class="tf-step">
+          <div class="tf-num">4</div>
+          <div class="tf-content">
+            <span class="tf-actor client">Client</span>
+            <div class="tf-title">Calls any protected endpoint</div>
+            <div class="tf-body">Attaches <code>Authorization: Bearer &lt;access_token&gt;</code> to the request header. The refresh cookie is not involved here.</div>
+          </div>
+        </div>
+        <div class="tf-step">
+          <div class="tf-num">5</div>
+          <div class="tf-content">
+            <span class="tf-actor server">Server</span>
+            <div class="tf-title">Validates the JWT signature, no database lookup</div>
+            <div class="tf-body">Verifies the token's signature and expiry against <code>ACCESS_TOKEN_SECRET</code>. Because the access token is short-lived and self-contained, no database query is needed on every request. Protected route validation stays fast regardless of scale.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tf-group">
+        <div class="tf-group-label">03 &mdash; Token Rotation (access token expired)</div>
+        <div class="tf-step">
+          <div class="tf-num">6</div>
+          <div class="tf-content">
+            <span class="tf-actor client">Client</span>
+            <div class="tf-title">POST /api/auth/refresh</div>
+            <div class="tf-body">Access token has expired. Client calls the refresh endpoint with no request body, the browser includes the httpOnly cookie automatically.</div>
+          </div>
+        </div>
+        <div class="tf-step">
+          <div class="tf-num">7</div>
+          <div class="tf-content">
+            <span class="tf-actor server">Server</span>
+            <div class="tf-title">Validates the refresh token against the database</div>
+            <div class="tf-body">SHA-256 hashes the raw cookie value and looks up the hash in the <code>refresh_tokens</code> table. Three checks must all pass: hash exists, <code>is_revoked = false</code>, and <code>expires_at</code> is in the future.</div>
+          </div>
+        </div>
+        <div class="tf-step">
+          <div class="tf-num">8</div>
+          <div class="tf-content">
+            <span class="tf-actor server">Server</span>
+            <div class="tf-title">Rotates the token and responds</div>
+            <div class="tf-body">Marks the current refresh token <code>is_revoked = true</code>. Issues a new refresh token under the same <code>family_id</code> and sets it as a new httpOnly cookie. Returns a fresh access token in the response body. The old token is now permanently dead.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tf-group tf-group-danger">
+        <div class="tf-group-label danger">04 &mdash; Theft Scenario: Reuse Detected</div>
+        <div class="tf-step danger">
+          <div class="tf-num danger">!</div>
+          <div class="tf-content">
+            <span class="tf-actor attacker">Attacker</span>
+            <div class="tf-title">Replays an old, already-rotated token</div>
+            <div class="tf-body">A refresh token that was previously rotated (and therefore revoked) is sent to <code>POST /api/auth/refresh</code>. This is the signature of a stolen token being replayed after the legitimate client already rotated past it.</div>
+          </div>
+        </div>
+        <div class="tf-step danger">
+          <div class="tf-num danger">!</div>
+          <div class="tf-content">
+            <span class="tf-actor server">Server</span>
+            <div class="tf-title">Detects reuse and destroys the entire family</div>
+            <div class="tf-body">The hash exists in the database but <code>is_revoked = true</code>. A legitimate client never sends a revoked token. The system treats this as a confirmed breach. Every token row sharing the same <code>family_id</code> is immediately revoked, every device using any token from this login session is logged out. Returns <code>401 TOKEN_REUSED</code>.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tf-group">
+        <div class="tf-group-label">05 &mdash; Logout</div>
+        <div class="tf-step">
+          <div class="tf-num">9</div>
+          <div class="tf-content">
+            <span class="tf-actor client">Client</span>
+            <div class="tf-title">POST /api/auth/logout</div>
+            <div class="tf-body">User signs out of the current session.</div>
+          </div>
+        </div>
+        <div class="tf-step">
+          <div class="tf-num">10</div>
+          <div class="tf-content">
+            <span class="tf-actor server">Server</span>
+            <div class="tf-title">Revokes this session only</div>
+            <div class="tf-body">Marks the current refresh token as revoked and clears the cookie. Only this session is terminated. Other devices signed in under different token families are completely unaffected and remain active.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Philosophy ─────────────────────────────────────────────── -->
+<section class="section" id="philosophy">
+  <div class="wrap">
+    <span class="section-label">Philosophy</span>
+    <h2>Every decision has a reason</h2>
+    <p class="section-intro">Auth is not a feature, it is the foundation every other feature stands on. The decisions below are not conventions adopted without thought.</p>
+
+    <div class="card-grid" style="margin-top: 36px;">
+      <div class="card">
+        <div class="card-icon">🔐</div>
+        <h3>Access tokens live in memory only</h3>
+        <p>The access token is returned in the response body and stored in application memory, never in <code>localStorage</code> or a cookie. <code>localStorage</code> is readable by any JavaScript on the page, including injected scripts. A memory-only token disappears on tab close and is never reachable from the document.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🍪</div>
+        <h3>Refresh token is httpOnly cookie</h3>
+        <p>The refresh token lives in a cookie marked <code>httpOnly</code>, <code>Secure</code>, and scoped to <code>path: /api/auth</code>. JavaScript cannot read it. The browser sends it automatically on refresh requests only. Even a complete XSS attack cannot extract it.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔄</div>
+        <h3>Tokens rotate on every use</h3>
+        <p>Each successful refresh issues a new refresh token and immediately marks the old one as revoked in the database. A refresh token is single-use by design. This is not optional behaviour, it is enforced at the database layer, not in application logic alone.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚨</div>
+        <h3>Reuse means breach, act accordingly</h3>
+        <p>If a refresh token that was already rotated is used again, the system treats it as evidence of theft. Every token in that entire family is revoked immediately, logging out all devices for that user. A legitimate client never sends a revoked token.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <h3>Passwords hashed with Argon2id</h3>
+        <p>Argon2id is the winner of the 2015 Password Hashing Competition and the current OWASP recommendation. It is memory-hard, meaning brute-force attacks require significant RAM, not just CPU, per attempt. Hashing happens before any database write, including the temporary pending registration table.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧱</div>
+        <h3>Strict provider separation</h3>
+        <p>An account created with Google cannot log in with a password, and vice versa. The API returns a machine-readable error code on the attempt, <code>OAUTH_ACCOUNT</code> or <code>ACCOUNT_USES_PASSWORD</code>, so the frontend can route the user correctly instead of showing a generic failure.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Architecture ───────────────────────────────────────────── -->
+<section class="section" id="architecture">
+  <div class="wrap">
+    <span class="section-label">Architecture</span>
+    <h2>The dual-token system</h2>
+    <p class="section-intro">Two tokens, two lifetimes, two storage locations. Neither one alone is enough to authenticate a request. ACCESS AND REFRESH TOKEN</p>
+
+    <div class="callout" style="margin-top: 24px;">
+      <p><strong>Raw tokens are never stored.</strong> The server stores only a SHA-256 hash of each refresh token. A database breach exposes hashes, not valid tokens. The raw token only exists in transit and in the client's httpOnly cookie.</p>
+    </div>
+
+    <h3 style="margin-top: 40px; margin-bottom: 16px;">Three separate signing secrets</h3>
+    <p style="margin-bottom: 16px;">Access tokens, refresh tokens, and password reset tokens each use a distinct JWT secret. A leaked reset token cannot be used as an access token, and rotating one secret does not invalidate the others.</p>
+    <table>
+      <thead><tr><th>Secret</th><th>Signs</th><th>Expiry</th></tr></thead>
+      <tbody>
+        <tr><td><code>ACCESS_TOKEN_SECRET</code></td><td>JWT access tokens, contains user ID and role in payload</td><td>15 minutes</td></tr>
+        <tr><td><code>REFRESH_TOKEN_SECRET</code></td><td>Refresh token metadata, raw token stored only in cookie</td><td>7 days</td></tr>
+        <tr><td><code>PASSWORD_RESET_SECRET</code></td><td>Single-use password reset link tokens</td><td>15 minutes</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── Token Family ───────────────────────────────────────────── -->
+<section class="section" id="token-family">
+  <div class="wrap">
+    <span class="section-label">Token Family System</span>
+    <h2>Theft detection that acts.</h2>
+    <p class="section-intro">Most systems check if a token is valid. This one also checks if it has already been used, and responds to reuse as the security event it actually is.</p>
+
+    <div class="flow-steps">
+      <div class="flow-step active">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Login creates a family</h3>
+          <p>A new random <code>family_id</code> is generated per login session. Every refresh token issued in that session carries the same family ID. This links all token rotations from one login to a single revocable chain.</p>
+        </div>
+      </div>
+      <div class="flow-step active">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Refresh rotates the token</h3>
+          <p>On a valid refresh request, the current token is marked <code>is_revoked = true</code> in the database. A new token is issued under the same <code>family_id</code>. The old token is now dead, it will never work again.</p>
+        </div>
+      </div>
+      <div class="flow-step active">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Normal use, client always has the latest token</h3>
+          <p>A client that rotates properly always has the current valid token. There is no race condition in normal usage because each response includes the next token before the client needs it.</p>
+        </div>
+      </div>
+      <div class="flow-step danger">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Reuse detected, family destroyed</h3>
+          <p>If a token that was already rotated (revoked) is presented again, it means one of two things: a bug in the client, or theft. The system assumes theft. <strong>All tokens in that family are revoked</strong>, every device that was authenticated using that login session is logged out immediately. The response is <code>401 TOKEN_REUSED</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-box" style="margin-top: 32px;">
+<span class="dim">Family ABC, normal rotation</span>
+
+  Login              <span class="hi">Token-1</span> (active, family: ABC)
+  Refresh  ──────▶   <span class="hi">Token-1</span> revoked  →  <span class="ac">Token-2</span> issued (family: ABC)
+  Refresh  ──────▶   <span class="ac">Token-2</span> revoked  →  <span class="bl">Token-3</span> issued (family: ABC)
+  Logout   ──────▶   <span class="bl">Token-3</span> revoked
+
+<span class="dim">───────────────────────────────────────────────────────────────</span>
+
+<span class="dim">Family XYZ, reuse detected</span>
+
+  Login              <span class="hi">Token-A</span> (active, family: XYZ)
+  Refresh  ──────▶   <span class="hi">Token-A</span> revoked  →  <span class="ac">Token-B</span> issued (family: XYZ)
+  <span class="c-p">Attacker presents Token-A again (already revoked)</span>
+             ──────▶  <span class="c-p">REUSE DETECTED, entire family XYZ revoked</span>
+                      <span class="c-p">Token-B also invalidated. User must log in again.</span>
+                      <span class="c-p">Response: 401 TOKEN_REUSED</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── API Reference ──────────────────────────────────────────── -->
+<section class="section" id="api">
+  <div class="wrap">
+    <span class="section-label">API Reference</span>
+    <p style="margin-bottom: 10px;">View the full module on github. Click on the github button in navbar to view</p>
+    <h2>Endpoints</h2>
+    <p class="section-intro">All endpoints live under <code>/api/auth</code>. Every response follows the same envelope: <code>success</code>, <code>message</code>, and where applicable <code>data</code>.</p>
+
+    <pre style="margin-top: 24px;"><code><span class="c-f">// Success</span>
+{ <span class="c-k">"success"</span>: <span class="c-w">true</span>, <span class="c-k">"message"</span>: <span class="c-s">"..."</span>, <span class="c-k">"data"</span>: { } }
+
+<span class="c-f">// Error</span>
+{ <span class="c-k">"success"</span>: <span class="c-w">false</span>, <span class="c-k">"message"</span>: <span class="c-s">"Human readable message"</span>, <span class="c-k">"code"</span>: <span class="c-s">"MACHINE_CODE"</span> }</code></pre>
+
+    <!-- Register -->
+    <div class="endpoint-block">
+      <div class="endpoint-head">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/api/auth/register</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Creates a new account. Behaviour controlled by the <code>REQUIRE_EMAIL_VERIFICATION</code> environment flag.</p>
+        <h4>Request body</h4>
+        <pre><code>{
+  <span class="c-k">"display_name"</span>: <span class="c-s">"Ada Okafor"</span>,
+  <span class="c-k">"email"</span>:        <span class="c-s">"ada@example.com"</span>,
+  <span class="c-k">"password"</span>:     <span class="c-s">"StrongPass1!"</span>
+}</code></pre>
+        <p>Password must be at least 8 characters, include one uppercase letter, one number, and one special character.</p>
+        <h4>Response, verification disabled</h4>
+        <pre><code>{
+  <span class="c-k">"success"</span>: <span class="c-w">true</span>,
+  <span class="c-k">"data"</span>: {
+    <span class="c-k">"user"</span>: { <span class="c-k">"id"</span>: <span class="c-s">"uuid"</span>, <span class="c-k">"email"</span>: <span class="c-s">"ada@example.com"</span>, <span class="c-k">"display_name"</span>: <span class="c-s">"Ada Okafor"</span>, <span class="c-k">"role"</span>: <span class="c-s">"user"</span> },
+    <span class="c-k">"accessToken"</span>: <span class="c-s">"eyJ..."</span>,
+    <span class="c-k">"requiresVerification"</span>: <span class="c-w">false</span>
+  }
+}
+<span class="c-f">// refresh token set as httpOnly cookie named refresh_token</span></code></pre>
+        <h4>Response, verification enabled</h4>
+        <pre><code>{
+  <span class="c-k">"success"</span>: <span class="c-w">true</span>,
+  <span class="c-k">"data"</span>: { <span class="c-k">"pendingId"</span>: <span class="c-n">42</span>, <span class="c-k">"requiresVerification"</span>: <span class="c-w">true</span> }
+}
+<span class="c-f">// OTP sent to the provided email. Store pendingId for the verify step.</span></code></pre>
+        <div class="err-pills">
+          <span class="err-pill"><span class="ep-status">409</span>EMAIL_EXISTS</span>
+          <span class="err-pill"><span class="ep-status">400</span>VALIDATION_ERROR</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verify OTP -->
+    <div class="endpoint-block">
+      <div class="endpoint-head">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/api/auth/verify-otp</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Completes registration when email verification is enabled. The user account is created at this point, not during registration.</p>
+        <h4>Request body</h4>
+        <pre><code>{ <span class="c-k">"pendingId"</span>: <span class="c-n">42</span>, <span class="c-k">"otp"</span>: <span class="c-s">"183920"</span> }</code></pre>
+        <p>Maximum 5 failed attempts. On the 5th failure the pending registration is deleted and the user must start over.</p>
+        <h4>Response</h4>
+        <pre><code>{
+  <span class="c-k">"success"</span>: <span class="c-w">true</span>,
+  <span class="c-k">"data"</span>: { <span class="c-k">"user"</span>: { ... }, <span class="c-k">"accessToken"</span>: <span class="c-s">"eyJ..."</span> }
+}</code></pre>
+        <div class="err-pills">
+          <span class="err-pill"><span class="ep-status">400</span>PENDING_NOT_FOUND</span>
+          <span class="err-pill"><span class="ep-status">400</span>OTP_EXPIRED</span>
+          <span class="err-pill"><span class="ep-status">400</span>INVALID_OTP</span>
+          <span class="err-pill"><span class="ep-status">429</span>OTP_ATTEMPTS_EXCEEDED</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resend OTP -->
+    <div class="endpoint-block">
+      <div class="endpoint-head">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/api/auth/resend-otp</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Generates a fresh 6-digit OTP and resets the attempt counter for an existing pending registration.</p>
+        <pre><code>{ <span class="c-k">"pendingId"</span>: <span class="c-n">42</span> }</code></pre>
+        <div class="err-pills"><span class="err-pill"><span class="ep-status">400</span>PENDING_NOT_FOUND</span></div>
+      </div>
+    </div>
+
+    <!-- Login -->
+    <div class="endpoint-block">
+      <div class="endpoint-head">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/api/auth/login</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Authenticates an existing local account. Creates a new token family and returns an access token in the body and refresh token as a cookie.</p>
+        <pre><code>{ <span class="c-k">"email"</span>: <span class="c-s">"ada@example.com"</span>, <span class="c-k">"password"</span>: <span class="c-s">"StrongPass1!"</span> }</code></pre>
+        <div class="callout">
+          <p>Both unknown email and wrong password return <code>INVALID_CREDENTIALS</code> with the same message. This prevents email enumeration, an attacker cannot tell whether an account exists from the response.</p>
+        </div>
+        <div class="err-pills">
+          <span class="err-pill"><span class="ep-status">401</span>INVALID_CREDENTIALS</span>
+          <span class="err-pill"><span class="ep-status">401</span>OAUTH_ACCOUNT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Refresh -->
+    <div class="endpoint-block">
+      <div class="endpoint-head">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/api/auth/refresh</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Issues a new access token using the refresh token from the httpOnly cookie. No request body required, the cookie is sent automatically. The old refresh token is revoked and a new one is issued in a fresh cookie.</p>
+        <pre><code><span class="c-f">// No request body</span>
+<span class="c-f">// curl --cookie "..." https://your-api/api/auth/refresh -X POST</span>
+
+{ <span class="c-k">"success"</span>: <span class="c-w">true</span>, <span class="c-k">"data"</span>: { <span class="c-k">"accessToken"</span>: <span class="c-s">"eyJ..."</span> } }</code></pre>
+        <div class="err-pills">
+          <span class="err-pill"><span class="ep-status">401</span>NO_TOKEN</span>
+          <span class="err-pill"><span class="ep-status">401</span>INVALID_TOKEN</span>
+          <span class="err-pill"><span class="ep-status">401</span>TOKEN_EXPIRED</span>
+          <span class="err-pill"><span class="ep-status">401</span>TOKEN_REUSED</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logout -->
+    <div class="endpoint-block">
+      <div class="endpoint-head">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/api/auth/logout</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Revokes the current refresh token and clears the cookie. Always returns success, a missing or already-invalid cookie is handled gracefully rather than throwing an error.</p>
+        <pre><code>{ <span class="c-k">"success"</span>: <span class="c-w">true</span>, <span class="c-k">"message"</span>: <span class="c-s">"Logged out successfully"</span> }</code></pre>
+      </div>
+    </div>
+
+    <!-- Me -->
+    <div class="endpoint-block">
+      <div class="endpoint-head">
+        <span class="method-badge method-get">GET</span>
+        <span class="endpoint-path">/api/auth/me</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Returns the currently authenticated user. Requires a valid access token in the <code>Authorization: Bearer &lt;token&gt;</code> header. Intended for session verification on app load.</p>
+        <pre><code>{
+  <span class="c-k">"success"</span>: <span class="c-w">true</span>,
+  <span class="c-k">"data"</span>: {
+    <span class="c-k">"user"</span>: { <span class="c-k">"id"</span>: <span class="c-s">"uuid"</span>, <span class="c-k">"email"</span>: <span class="c-s">"ada@example.com"</span>, <span class="c-k">"display_name"</span>: <span class="c-s">"Ada Okafor"</span>, <span class="c-k">"role"</span>: <span class="c-s">"user"</span>, <span class="c-k">"is_verified"</span>: <span class="c-w">true</span> }
+  }
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- Forgot password -->
+    <div class="endpoint-block">
+      <div class="endpoint-head">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/api/auth/forgot-password</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Sends a password reset link to the given email. Always returns success regardless of whether the account exists, to prevent email enumeration.</p>
+        <pre><code>{ <span class="c-k">"email"</span>: <span class="c-s">"ada@example.com"</span> }</code></pre>
+        <p>The reset link expires in 15 minutes. Each request generates a new token and invalidates the previous one.</p>
+      </div>
+    </div>
+
+    <!-- Reset password -->
+    <div class="endpoint-block">
+      <div class="endpoint-head">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/api/auth/reset-password</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Resets the user's password using the token from the email link. On success, all existing sessions for the user are revoked across all devices.</p>
+        <pre><code>{ <span class="c-k">"token"</span>: <span class="c-s">"raw-token-from-link"</span>, <span class="c-k">"password"</span>: <span class="c-s">"NewPass1!"</span> }</code></pre>
+        <div class="callout">
+          <p>The token is marked used <em>before</em> the password is updated in the database. This eliminates a race condition where two simultaneous reset requests with the same token could both succeed.</p>
+        </div>
+        <div class="err-pills">
+          <span class="err-pill"><span class="ep-status">400</span>INVALID_RESET_TOKEN</span>
+          <span class="err-pill"><span class="ep-status">400</span>RESET_TOKEN_USED</span>
+          <span class="err-pill"><span class="ep-status">400</span>RESET_TOKEN_EXPIRED</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Google OAuth -->
+    <div class="endpoint-block">
+      <div class="endpoint-head">
+        <span class="method-badge method-post">POST</span>
+        <span class="endpoint-path">/api/auth/google</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Completes Google sign-in or sign-up. The frontend initiates the flow by redirecting to Google's consent screen. Google redirects back with a one-time <code>code</code>. Extract it and send it here immediately, it expires within seconds.</p>
+        <pre><code>{ <span class="c-k">"code"</span>: <span class="c-s">"4/0Adeu5B..."</span> }</code></pre>
+        <pre><code>{
+  <span class="c-k">"success"</span>: <span class="c-w">true</span>,
+  <span class="c-k">"data"</span>: {
+    <span class="c-k">"user"</span>: { ... },
+    <span class="c-k">"accessToken"</span>: <span class="c-s">"eyJ..."</span>,
+    <span class="c-k">"isNewUser"</span>: <span class="c-w">false</span>
+  }
+}</code></pre>
+        <p><code>isNewUser: true</code> on first sign-in, use this to redirect to onboarding. Google's own tokens are exchanged and discarded server-side, never stored.</p>
+        <div class="err-pills">
+          <span class="err-pill"><span class="ep-status">401</span>GOOGLE_AUTH_FAILED</span>
+          <span class="err-pill"><span class="ep-status">409</span>ACCOUNT_USES_PASSWORD</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Live Demo ───────────────────────────────────────────────── -->
+<section class="section" id="demo">
+  <div class="wrap">
+    <span class="section-label">Live Demo</span>
+    <h2>Try the flow</h2>
+    <p class="section-intro">Walk through the full auth lifecycle against the live demo server. The reuse detection step is the one worth watching.</p>
+
+    <div class="demo-wrapper">
+      <div class="demo-tab-bar">
+        <div class="demo-tab active" data-tab="register">1. Register</div>
+        <div class="demo-tab" data-tab="login">2. Login</div>
+        <div class="demo-tab" data-tab="refresh">3. Refresh</div>
+        <div class="demo-tab" data-tab="reuse">4. Reuse Detection</div>
+      </div>
+
+      <!-- Config -->
+      <div style="padding: 14px 22px 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <div class="demo-input-row">
+          <span class="demo-label">API Base</span>
+          <input class="demo-input" id="demoBase" type="text" value="https://auth-gateway-demo.onrender.com" placeholder="https://your-api.onrender.com" />
+        </div>
+      </div>
+
+      <!-- Step 1: Register -->
+      <div class="demo-panel active" id="tab-register">
+        <div class="demo-step-title">STEP 01, POST /api/auth/register</div>
+        <div class="demo-input-row">
+          <span class="demo-label">Name</span>
+          <input class="demo-input" id="reg-name" type="text" placeholder="Ada Okafor" value="Demo User" />
+        </div>
+        <div class="demo-input-row">
+          <span class="demo-label">Email</span>
+          <input class="demo-input" id="reg-email" type="email" placeholder="ada@example.com" />
+        </div>
+        <div class="demo-input-row">
+          <span class="demo-label">Password</span>
+          <input class="demo-input" id="reg-password" type="password" placeholder="StrongPass1!" value="DemoPass123!" />
+        </div>
+        <button class="demo-btn" onclick="demoRegister()">Send request</button>
+        <div class="demo-response" id="reg-res">Waiting...</div>
+        <div class="demo-note" id="reg-note"></div>
+      </div>
+
+
+      <!-- Step 2: Login -->
+      <div class="demo-panel" id="tab-login">
+        <div class="demo-step-title">STEP 02, POST /api/auth/login</div>
+        <div class="demo-input-row">
+          <span class="demo-label">Email</span>
+          <input class="demo-input" id="login-email" type="email" placeholder="Auto-filled from step 1" />
+        </div>
+        <div class="demo-input-row">
+          <span class="demo-label">Password</span>
+          <input class="demo-input" id="login-password" type="password" value="DemoPass123!" />
+        </div>
+        <button class="demo-btn" onclick="demoLogin()">Log in</button>
+        <div class="demo-response" id="login-res">Waiting...</div>
+        <div class="demo-note" id="login-note"></div>
+      </div>
+
+      <!-- Step 3: Refresh -->
+      <div class="demo-panel" id="tab-refresh">
+        <div class="demo-step-title">STEP 03, POST /api/auth/refresh</div>
+        <p style="font-size:0.82rem; color: var(--code-faded); margin-bottom: 14px;">No body needed. The refresh token cookie is sent automatically. A new access token is returned and the old refresh token is rotated.</p>
+        <button class="demo-btn" onclick="demoRefresh()">Refresh token</button>
+        <div class="demo-response" id="refresh-res">Waiting...</div>
+        <div class="demo-note" id="refresh-note"></div>
+      </div>
+
+      <!-- Step 4: Reuse Detection -->
+      <div class="demo-panel" id="tab-reuse">
+        <div class="demo-step-title">STEP 04, Token Reuse Detection</div>
+        <p style="font-size:0.82rem; color: var(--code-faded); margin-bottom: 16px;">This sends the old refresh token (from before step 4) back to the server. Since it was already rotated, the server detects reuse and revokes the entire token family.</p>
+        <button class="demo-btn" onclick="demoFirstRefresh()" id="btn-first-refresh">First refresh (save old token)</button>
+        <div class="demo-response" id="reuse-first-res" style="margin-bottom: 12px;">Click the button above to capture a token, then try to reuse it below.</div>
+        <button class="demo-btn danger" onclick="demoReuseOld()" id="btn-reuse" disabled>Reuse old token (should fail)</button>
+        <div class="demo-response" id="reuse-res">Waiting...</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Error codes ────────────────────────────────────────────── -->
+<section class="section" id="errors">
+  <div class="wrap">
+    <span class="section-label">Error Reference</span>
+    <h2>Machine-readable codes</h2>
+    <p class="section-intro">Every error response includes a <code>code</code> field intended for programmatic handling. The <code>message</code> field is human-readable and safe to surface to users.</p>
+
+    <table>
+      <thead><tr><th>Code</th><th>Status</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>EMAIL_EXISTS</code></td><td>409</td><td>Registration email already belongs to a confirmed account</td></tr>
+        <tr><td><code>INVALID_CREDENTIALS</code></td><td>401</td><td>Email not found or password incorrect, intentionally the same message for both</td></tr>
+        <tr><td><code>OAUTH_ACCOUNT</code></td><td>401</td><td>Password login attempted on a Google-registered account</td></tr>
+        <tr><td><code>ACCOUNT_USES_PASSWORD</code></td><td>409</td><td>Google sign-in attempted for an account registered with a password</td></tr>
+        <tr><td><code>NO_TOKEN</code></td><td>401</td><td>No refresh token cookie present, user is not authenticated</td></tr>
+        <tr><td><code>INVALID_TOKEN</code></td><td>401</td><td>Refresh token not found in the database, invalid or already cleaned up</td></tr>
+        <tr><td><code>TOKEN_EXPIRED</code></td><td>401</td><td>Refresh token found but past its expiry, user must log in again</td></tr>
+        <tr><td><code>TOKEN_REUSED</code></td><td>401</td><td>A previously rotated token was presented, entire family revoked, re-login required</td></tr>
+        <tr><td><code>PENDING_NOT_FOUND</code></td><td>400</td><td>Registration session expired or never existed</td></tr>
+        <tr><td><code>OTP_EXPIRED</code></td><td>400</td><td>OTP is past its 10-minute window</td></tr>
+        <tr><td><code>INVALID_OTP</code></td><td>400</td><td>Code does not match, response includes remaining attempts</td></tr>
+        <tr><td><code>OTP_ATTEMPTS_EXCEEDED</code></td><td>429</td><td>5 failed OTP attempts, pending registration deleted, must register again</td></tr>
+        <tr><td><code>INVALID_RESET_TOKEN</code></td><td>400</td><td>Password reset token not found in the database</td></tr>
+        <tr><td><code>RESET_TOKEN_USED</code></td><td>400</td><td>Reset token already consumed, single use only</td></tr>
+        <tr><td><code>RESET_TOKEN_EXPIRED</code></td><td>400</td><td>Reset token past its 15-minute window</td></tr>
+        <tr><td><code>GOOGLE_AUTH_FAILED</code></td><td>401</td><td>Google code exchange failed, code expired or already used</td></tr>
+        <tr><td><code>USER_NOT_FOUND</code></td><td>404</td><td>Authenticated user no longer exists in the database</td></tr>
+        <tr><td><code>VALIDATION_ERROR</code></td><td>400</td><td>Request body failed schema validation</td></tr>
+      </tbody>
+    </table>
+
+
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Auth Gateway - Built by <strong>Tech FBI</strong> - <a href="https://github.com/techfbi/" target="_blank" rel="noopener">View code on GitHub</a></p>
+  </div>
+</footer>
+
+<script>
+  /* ── Theme toggle ─────────────────────────────────────────── */
+  const btn = document.getElementById('themeBtn');
+  const apply = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    btn.textContent = t === 'dark' ? '☀' : '☾';
+    localStorage.setItem('ag-theme', t);
+  };
+  apply(localStorage.getItem('ag-theme') || 'light');
+  btn.addEventListener('click', () => {
+    apply(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  /* ── Tab switching ────────────────────────────────────────── */
+  document.querySelectorAll('.demo-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.demo-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ── Demo state ───────────────────────────────────────────── */
+  let state = { pendingId: null, email: null, oldCookie: null };
+
+  const base = () => document.getElementById('demoBase').value.replace(/\/$/, '');
+
+  const setRes = (id, text, type = '') => {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'demo-response' + (type ? ' ' + type : '');
+  };
+
+  const req = async (path, method = 'POST', body = null) => {
+    const opts = {
+      method,
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const r = await fetch(base() + path, opts);
+    const json = await r.json();
+    return { ok: r.ok, status: r.status, json };
+  };
+
+  const fmt = (json) => JSON.stringify(json, null, 2);
+
+  /* ── Step 1: Register ─────────────────────────────────────── */
+  const demoRegister = async () => {
+    const name  = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const pass  = document.getElementById('reg-password').value;
+    if (!email) { setRes('reg-res', 'Enter an email first.', 'error'); return; }
+    setRes('reg-res', 'Sending...');
+    try {
+      const { ok, json } = await req('/api/auth/register', 'POST', {
+        display_name: name, email, password: pass
+      });
+      setRes('reg-res', fmt(json), ok ? 'success' : 'error');
+      if (ok) {
+        state.email = email;
+        document.getElementById('login-email').value = email;
+        document.getElementById('reg-note').textContent = '→ Account created. Move to step 2 to log in.';
+      }
+    } catch(e) { setRes('reg-res', 'Network error: ' + e.message, 'error'); }
+  };
+
+  /* ── Step 2: Login ────────────────────────────────────────── */
+  const demoLogin = async () => {
+    const email = document.getElementById('login-email').value;
+    const pass  = document.getElementById('login-password').value;
+    setRes('login-res', 'Logging in...');
+    try {
+      const { ok, json } = await req('/api/auth/login', 'POST', { email, password: pass });
+      setRes('login-res', fmt(json), ok ? 'success' : 'error');
+      if (ok) {
+        document.getElementById('login-note').textContent = '→ Refresh token set as httpOnly cookie. Access token is in the response data above. Move to step 4.';
+      }
+    } catch(e) { setRes('login-res', 'Network error: ' + e.message, 'error'); }
+  };
+
+  /* ── Step 3: Refresh ──────────────────────────────────────── */
+  const demoRefresh = async () => {
+    setRes('refresh-res', 'Refreshing...');
+    try {
+      const { ok, json } = await req('/api/auth/refresh', 'POST');
+      setRes('refresh-res', fmt(json), ok ? 'success' : 'error');
+      if (ok) {
+        document.getElementById('refresh-note').textContent = '→ New access token issued. Refresh cookie rotated. Old token is now revoked.';
+      }
+    } catch(e) { setRes('refresh-res', 'Network error: ' + e.message, 'error'); }
+  };
+
+  /* ── Step 4: Reuse detection ──────────────────────────────── */
+  // Since the cookie is httpOnly and JS can't read it, this demo
+  // shows the concept by doing two rapid refreshes. The first issues
+  // a new token; the second reuses the one that was already rotated,
+  // triggering family revocation. In a real attack scenario, the attacker
+  // would be replaying the stolen cookie from before the first rotation.
+  let savedCookieMoment = false;
+
+  const demoFirstRefresh = async () => {
+    setRes('reuse-first-res', 'Doing first refresh...');
+    try {
+      const { ok, json } = await req('/api/auth/refresh', 'POST');
+      setRes('reuse-first-res', fmt(json), ok ? 'success' : 'error');
+      if (ok) {
+        savedCookieMoment = true;
+        document.getElementById('btn-reuse').disabled = false;
+        document.getElementById('reuse-first-res').textContent +=
+          '\n\n// Token rotated. The old token is now revoked in the DB.\n// Now immediately refresh again, simulating an attacker replaying the old token.';
+      }
+    } catch(e) { setRes('reuse-first-res', 'Network error: ' + e.message, 'error'); }
+  };
+
+  const demoReuseOld = async () => {
+    if (!savedCookieMoment) return;
+    setRes('reuse-res', 'Sending second refresh with the already-rotated token...');
+    try {
+      const { ok, json } = await req('/api/auth/refresh', 'POST');
+      if (!ok && json.code === 'TOKEN_REUSED') {
+        setRes('reuse-res',
+          fmt(json) + '\n\n// TOKEN_REUSED detected.\n// The entire token family has been revoked.\n// All sessions for this user are now logged out.',
+          'error'
+        );
+      } else {
+        setRes('reuse-res', fmt(json), ok ? 'success' : 'error');
+      }
+    } catch(e) { setRes('reuse-res', 'Network error: ' + e.message, 'error'); }
+  };
+</script>
+</body>
+</html>

@@ -46,6 +46,8 @@ app.use(
 
 app.use(express.urlencoded({ extended: true, limit: "20kb" })); // Allows form submission
 app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(globalLimiter)
 
 

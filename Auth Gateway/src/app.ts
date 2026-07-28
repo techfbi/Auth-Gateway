@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import { env } from "./config/env.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { authRouter } from "./auth module/auth.routes.js";
+import { globalLimiter } from "./middleware/rateLimiter.js";
 
 export const app = express();
 
@@ -45,6 +46,7 @@ app.use(
 
 app.use(express.urlencoded({ extended: true, limit: "20kb" })); // Allows form submission
 app.use(cookieParser());
+app.use(globalLimiter)
 
 
 app.get("/", (_req, res) => {

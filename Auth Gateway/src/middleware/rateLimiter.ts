@@ -225,3 +225,10 @@ export const refreshLimiter = rateLimiter({
   maxRequests: 30,
   keyPrefix: "auth:refresh",
 });
+
+// Auth global Limit
+export const globalLimiter = rateLimiter({
+  windowSeconds: 60,
+  maxRequests: 200,
+  keyPrefix: "auth:global",
+});

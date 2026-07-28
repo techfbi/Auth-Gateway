@@ -1,8 +1,8 @@
 import "dotenv/config";
 import { app } from "./app.js";
-import { env } from "./config/env.js";
-import { pgPool } from "./config/db.postgres.js";
-import { connectRedis } from "./config/db.redis.js";
+import { env } from "./src/config/env.js";
+import { pgPool } from "./src/config/db.postgres.js";
+import { connectRedis } from "./src/config/db.redis.js";
 
 async function startServer(): Promise<void> {
   try {

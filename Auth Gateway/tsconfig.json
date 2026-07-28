@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src/**/*",],
+  "exclude": ["node_modules", "dist"]
+}
+
+/* 
+target: ES2022 — compiles to modern JavaScript. Render uses Node 18+ which understands this natively.
+module: NodeNext — Node.js default module system for ESM support.
+strict: true — enables all strict type checks. Catches bugs at compile time that would silently fail at runtime.
+esModuleInterop: true — lets you write import express from "express" instead of import * as express from "express".
+outDir / rootDir — compiled JavaScript goes into dist/, source TypeScript stays in src/.
+*/

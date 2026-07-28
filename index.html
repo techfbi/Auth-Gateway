@@ -1480,7 +1480,7 @@
       const { ok, json } = await req('/api/auth/login', 'POST', { email, password: pass });
       setRes('login-res', fmt(json), ok ? 'success' : 'error');
       if (ok) {
-        document.getElementById('login-note').textContent = '→ Refresh token set as httpOnly cookie. Access token is in the response data above. Move to step 4.';
+        document.getElementById('login-note').textContent = '→ Refresh token set as httpOnly cookie. Access token is in the response data above. Move to step 3.';
       }
     } catch(e) { setRes('login-res', 'Network error: ' + e.message, 'error'); }
   };

@@ -24,7 +24,7 @@ const isProduction = process.env.NODE_ENV === "production";
 const cookieOptions = {
   httpOnly: true,
   secure: isProduction,  // this is true
-  sameSite:  "lax" as "lax",   // lax now in prod and dev, proxy set up in varcel config
+  sameSite:  "none" as "none",   // none now in prod, Change where needed
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
   path: "/api/auth",            // cookie only sent to auth routes. reduces exposure
 };
@@ -42,7 +42,7 @@ const clearRefreshCookie = (res: Response): void => {
     path: "/api/auth",
     // Must match the original cookie options exactly for the browser to clear it
     secure: isProduction,
-    sameSite: (isProduction ? "none" : "lax") as "none" | "lax",
+    sameSite: "none" as "none"
   });
 };
 

@@ -18,6 +18,13 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
   GOOGLE_REDIRECT_URI: z.string().url(),
+    // Controls whether email OTP verification is required on registration.
+  // Set to "false" in development to test with non-existing emails freely.Set to "true" in production.
+  REQUIRE_EMAIL_VERIFICATION: z
+  .enum(["true", "false"]) // env must only takein "true" or "false" as string.
+  .default("false") // if that env doesnt exist, default to false to avoid app crash
+  .transform((val) => val === "true"), // transform the string "true"/"false" into actual boolean true/false for use in our code. bcos all env vars are strings by default.
+
 });
 
 const parsed = envSchema.safeParse(process.env); //parse returns an error immediately but safeparse returns an object like success: true/false and data.

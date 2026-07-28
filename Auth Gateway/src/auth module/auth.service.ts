@@ -83,7 +83,31 @@ export const registerUser = async (
   const passwordHash = await argon2.hash(input.password);
 
   // ---------------------------------------------------------------------------
-  // verification 
+  // Path A. verification disabled (development and testing)
+  // ---------------------------------------------------------------------------
+  if (!env.REQUIRE_EMAIL_VERIFICATION) {
+    const result = await pgPool.query(
+      `INSERT INTO users (email, password_hash, display_name, provider)
+       VALUES ($1, $2, $3, 'local')
+       RETURNING id, email, display_name, role, is_verified, created_at`,
+      [input.email, passwordHash, input.display_name]
+    );
+
+    const user: SafeUser = result.rows[0];
+
+    const familyId = generateToken(16);
+    const refreshToken = await generateAndStoreRefreshToken(user.id, familyId);
+    const accessToken = generateAccessToken(user.id, user.role);
+
+    console.log(
+      `DEVELOPMENT MODE: User registered without verification. ${user.id}`
+    );
+
+    return { verified: true, user, tokens: { accessToken, refreshToken } };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Path B. verification enabled (production)
   // ---------------------------------------------------------------------------
 
   // Generate a 6-digit numeric OTP
@@ -114,7 +138,7 @@ export const registerUser = async (
   await sendOtpEmail(input.email, input.display_name, otp);
 
   console.log(
-    `[REMOVE LOG LATER] Pending registration created. OTP sent. pendingId.`
+    `[REMOVE LOG LATER] Pending registration created. OTP sent. pendingId. ${pendingId}`
   );
 
   return {

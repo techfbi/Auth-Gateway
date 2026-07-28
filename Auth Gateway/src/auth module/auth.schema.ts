@@ -30,9 +30,9 @@ export const registerSchema = z
       .toLowerCase()  // prevents duplicate accounts
       .trim(),
     password: passwordSchema,
-    confirm_password: z.string(),
+    confirm_password: z.string().nullable().optional(),
   })
-  .refine((data) => data.password === data.confirm_password, {
+  .refine((data) => !data.confirm_password || data.password === data.confirm_password, {
     // refine() adds cross-field validation, Zod cannot express this with single-field rules alone
     message: "Passwords do not match",
     path: ["confirm_password"],

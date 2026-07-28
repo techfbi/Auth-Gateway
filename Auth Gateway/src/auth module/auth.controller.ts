@@ -52,6 +52,7 @@ const clearRefreshCookie = (res: Response): void => {
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const input = req.body as RegisterInput;
+    console.log("register body", input);
     const result = await registerUser(input);
 
     if (result.verified) {

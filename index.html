@@ -1221,15 +1221,22 @@
   </div>
 </footer>
 
+<script src="https://unpkg.com/lucide@latest"></script>
+
 <script>
   /* ── Theme toggle ─────────────────────────────────────────── */
   const btn = document.getElementById('themeBtn');
+  
   const apply = (t) => {
     document.documentElement.setAttribute('data-theme', t);
-    btn.textContent = t === 'dark' ? '☀' : '☾';
+    const icon = t === 'dark' ? 'sun' : 'moon';
+    btn.innerHTML = `<i data-lucide="${icon}" style="width:15px;height:15px;"></i>`;
+    lucide.createIcons();
     localStorage.setItem('ag-theme', t);
   };
+  
   apply(localStorage.getItem('ag-theme') || 'light');
+  
   btn.addEventListener('click', () => {
     apply(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
   });

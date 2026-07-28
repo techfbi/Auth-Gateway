@@ -3,9 +3,9 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
-import { env } from "./src/config/env.js";
-import { errorHandler } from "./src/middleware/errorHandler.js";
-import { authRouter } from "./src/auth module/auth.routes.js";
+import { env } from "./config/env.js";
+import { errorHandler } from "./middleware/errorHandler.js";
+import { authRouter } from "./auth module/auth.routes.js";
 
 export const app = express();
 

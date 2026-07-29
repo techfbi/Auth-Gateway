@@ -58,7 +58,7 @@ REQUIRE_EMAIL_VERIFICATION=false
 
 ## File structure
 Auth Gateway/
-src/
+src/  
 auth module/
 + auth.controller.ts Request handlers for all ten auth endpoints
 + auth.routes.ts Route definitions with rate limiter middleware assigned per route
@@ -87,24 +87,24 @@ shared/
 + response.ts Success and error response helpers
 + types.ts Shared TypeScript types
 
-app.ts Express app, middleware, routes
-server.ts HTTP server entry point
-Auth Gateway/
-index.html Standalone documentation site, open directly in a browser
+app.ts Express app, middleware, routes  
+server.ts HTTP server entry point  
+Auth Gateway/  
+index.html Standalone documentation site, open directly in a browser  
 
 ## API endpoints
 
 All routes are under `/api/auth`. Full request and response documentation is in `index.html`.
-POST /api/auth/register Create an account
-POST /api/auth/verify-otp Complete registration when verification is enabled
-POST /api/auth/resend-otp Request a fresh OTP for a pending registration
-POST /api/auth/login Log in with email and password
-POST /api/auth/refresh Rotate the refresh token, get a new access token
-POST /api/auth/logout Revoke the current session
-GET /api/auth/me Return the currently authenticated user
-POST /api/auth/forgot-password Send a password reset email
-POST /api/auth/reset-password Set a new password using the reset token
-POST /api/auth/google Complete Google sign-in or sign-up
+POST /api/auth/register Create an account  
+POST /api/auth/verify-otp Complete registration when verification is enabled  
+POST /api/auth/resend-otp Request a fresh OTP for a pending registration  
+POST /api/auth/login Log in with email and password  
+POST /api/auth/refresh Rotate the refresh token, get a new access token  
+POST /api/auth/logout Revoke the current session  
+GET /api/auth/me Return the currently authenticated user  
+POST /api/auth/forgot-password Send a password reset email  
+POST /api/auth/reset-password Set a new password using the reset token  
+POST /api/auth/google Complete Google sign-in or sign-up  
 
 ## Response envelope
 
